@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="uk" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>password-hash-demo</title>
+  <link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=zodiak@400,700&display=swap" rel="stylesheet">
+  <style>
+    :root, [data-theme="light"] {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --space-1: 0.25rem; --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem;
+      --space-5: 1.25rem; --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem;
+      --space-12: 3rem; --space-16: 4rem;
+      --color-bg: #f7f6f2; --color-surface: #f9f8f5; --color-surface-2: #fbfbf9;
+      --color-surface-offset: #edeae5; --color-border: #d4d1ca; --color-divider: #dcd9d5;
+      --color-text: #28251d; --color-text-muted: #6a6964; --color-text-faint: #8e8c87;
+      --color-text-inverse: #f9f8f4; --color-primary: #01696f; --color-primary-hover: #0c4e54;
+      --color-primary-highlight: #cedcd8; --color-success: #437a22; --color-error: #a12c7b;
+      --radius-sm: 0.375rem; --radius-md: 0.5rem; --radius-lg: 0.75rem; --radius-xl: 1rem;
+      --shadow-sm: 0 1px 2px rgba(20,20,20,.06); --shadow-md: 0 8px 24px rgba(20,20,20,.08);
+      --font-body: 'Satoshi', system-ui, sans-serif; --font-display: 'Zodiak', Georgia, serif;
+    }
+    [data-theme="dark"] {
+      --color-bg: #171614; --color-surface: #1c1b19; --color-surface-2: #201f1d;
+      --color-surface-offset: #22211f; --color-border: #393836; --color-divider: #262523;
+      --color-text: #cdccca; --color-text-muted: #9a9996; --color-text-faint: #74726f;
+      --color-text-inverse: #2b2a28; --color-primary: #4f98a3; --color-primary-hover: #227f8b;
+      --color-primary-highlight: #313b3b; --color-success: #6daa45; --color-error: #d163a7;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,.2); --shadow-md: 0 12px 32px rgba(0,0,0,.35);
+    }
+    *,*::before,*::after{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;min-height:100vh;font-family:var(--font-body);font-size:var(--text-base);line-height:1.6;background:var(--color-bg);color:var(--color-text)}
+    h1,h2,h3{line-height:1.1;margin:0}
+    p{margin:0;max-width:72ch}
+    button,input,select,textarea{font:inherit}
+    button{cursor:pointer}
+    a,button,input,select{transition:.18s ease}
+    :focus-visible{outline:2px solid var(--color-primary);outline-offset:2px;border-radius:var(--radius-sm)}
+    .wrap{max-width:1200px;margin:0 auto;padding:var(--space-6)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:var(--space-4);padding-block:var(--space-4)}
+    .brand{display:flex;align-items:center;gap:var(--space-3);font-weight:700}
+    .logo{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--color-primary),transparent);display:grid;place-items:center;border:1px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-border))}
+    .logo svg{width:22px;height:22px;color:var(--color-primary)}
+    .theme{min-width:44px;min-height:44px;border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);border-radius:999px;padding:0 .9rem}
+    .hero{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--space-6);padding-block:var(--space-8) var(--space-10)}
+    .hero-card,.panel,.codebox,.note,.mini{background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-xl);box-shadow:var(--shadow-sm)}
+    .hero-copy{display:flex;flex-direction:column;gap:var(--space-5);justify-content:center}
+    .eyebrow{font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.12em;color:var(--color-primary);font-weight:700}
+    .title{font-family:var(--font-display);font-size:var(--text-xl)}
+    .lead{color:var(--color-text-muted)}
+    .chips{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+    .chip{padding:.45rem .75rem;border-radius:999px;background:var(--color-primary-highlight);color:var(--color-primary);font-size:var(--text-xs);font-weight:700}
+    .hero-card{padding:var(--space-5);display:grid;gap:var(--space-4)}
+    .steps{display:grid;gap:var(--space-3)}
+    .step{display:grid;grid-template-columns:34px 1fr;gap:var(--space-3);align-items:start;padding:var(--space-3);border-radius:var(--radius-lg);background:var(--color-surface-2)}
+    .num{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;font-weight:700;background:var(--color-primary);color:var(--color-text-inverse)}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6);padding-bottom:var(--space-10)}
+    .panel{padding:var(--space-5);display:grid;gap:var(--space-4)}
+    .panel h2{font-size:var(--text-lg)}
+    .field{display:grid;gap:var(--space-2)}
+    label{font-size:var(--text-sm);font-weight:700}
+    input,select{width:100%;min-height:44px;padding:.85rem 1rem;border-radius:var(--radius-md);border:1px solid var(--color-border);background:var(--color-surface-2);color:var(--color-text)}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)}
+    .actions{display:flex;flex-wrap:wrap;gap:var(--space-3)}
+    .btn{min-height:44px;padding:.85rem 1.1rem;border-radius:999px;border:1px solid transparent;font-size:var(--text-sm);font-weight:700}
+    .btn-primary{background:var(--color-primary);color:var(--color-text-inverse)}
+    .btn-primary:hover{background:var(--color-primary-hover)}
+    .btn-secondary{background:transparent;border-color:var(--color-border);color:var(--color-text)}
+    .note{padding:var(--space-4);background:color-mix(in srgb, var(--color-primary) 4%, var(--color-surface));}
+    .miniwrap{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-3)}
+    .mini{padding:var(--space-4);background:var(--color-surface-2)}
+    .mini strong{display:block;font-size:var(--text-sm);margin-bottom:.25rem}
+    .status{padding:var(--space-3) var(--space-4);border-radius:var(--radius-lg);font-size:var(--text-sm);font-weight:700}
+    .status.ok{background:color-mix(in srgb, var(--color-success) 16%, var(--color-surface));color:var(--color-success)}
+    .status.bad{background:color-mix(in srgb, var(--color-error) 14%, var(--color-surface));color:var(--color-error)}
+    .codebox{overflow:hidden}
+    .codehead{display:flex;justify-content:space-between;align-items:center;padding:var(--space-3) var(--space-4);border-bottom:1px solid var(--color-divider);background:var(--color-surface-2)}
+    pre{margin:0;padding:var(--space-4);overflow:auto;font-size:14px;line-height:1.5;background:var(--color-surface);color:var(--color-text)}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    .footer{padding:var(--space-6) 0 var(--space-10);color:var(--color-text-muted);font-size:var(--text-sm)}
+    @media (max-width: 920px){.hero,.grid,.miniwrap,.row{grid-template-columns:1fr}.wrap{padding:var(--space-4)}.title{font-size:clamp(2rem,8vw,2.6rem)}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 11.5 12 4l6 7.5"/><path d="M8 11v7h8v-7"/><path d="M10.5 14.5h3"/></svg>
+        </div>
+        <span>Password Hash Demo</span>
+      </div>
+      <button class="theme" data-theme-toggle aria-label="Перемкнути тему">◐</button>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="eyebrow">bcrypt + argon2id</div>
+        <h1 class="title">Демо правильної реєстрації та логіну без збереження відкритого пароля</h1>
+        <p class="lead">Ця сторінка показує потік: сервер приймає пароль, хешує його, кладе в БД лише хеш, а під час логіну робить тільки перевірку через <code>compare()</code> або <code>verify()</code>.</p>
+        <div class="chips">
+          <span class="chip">password → hash</span>
+          <span class="chip">DB stores hash only</span>
+          <span class="chip">JWT after success</span>
+        </div>
+      </div>
+      <div class="hero-card">
+        <h2>Потік автентифікації</h2>
+        <div class="steps">
+          <div class="step"><div class="num">1</div><div><strong>Реєстрація</strong><div>Сервер отримує пароль, обчислює bcrypt/Argon2id хеш і записує в БД тільки його.</div></div></div>
+          <div class="step"><div class="num">2</div><div><strong>Логін</strong><div>Сервер дістає хеш з БД і виконує перевірку введеного пароля через compare/verify.</div></div></div>
+          <div class="step"><div class="num">3</div><div><strong>Успіх</strong><div>Лише після вдалого збігу сервер видає access/refresh token або відкриває сесію.</div></div></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Інтерактивне пояснення</h2>
+        <div class="field">
+          <label for="algo">Алгоритм</label>
+          <select id="algo">
+            <option value="bcrypt">bcrypt</option>
+            <option value="argon2">Argon2id</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" value="user@example.com" />
+        </div>
+        <div class="row">
+          <div class="field">
+            <label for="password">Пароль для реєстрації</label>
+            <input id="password" type="password" value="MyStrongPass123!" />
+          </div>
+          <div class="field">
+            <label for="loginPassword">Пароль для логіну</label>
+            <input id="loginPassword" type="password" value="MyStrongPass123!" />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-primary" id="simulate">Симулювати</button>
+          <button class="btn btn-secondary" id="wrongPass">Підставити неправильний пароль</button>
+        </div>
+        <div id="result" class="status ok">Готово до запуску демонстрації.</div>
+        <div class="note">
+          Сервер <strong>не відновлює</strong> пароль із хешу. Він тільки перевіряє, чи введений пароль дає такий самий результат при верифікації.
+        </div>
+        <div class="miniwrap">
+          <div class="mini"><strong>У БД</strong><span id="dbState">Ще нічого не збережено</span></div>
+          <div class="mini"><strong>Порівняння</strong><span id="cmpState">Очікує запуску</span></div>
+          <div class="mini"><strong>Токени</strong><span id="tokenState">Не видані</span></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Node.js код</h2>
+        <div class="codebox">
+          <div class="codehead"><strong>bcrypt</strong><span>реєстрація + логін</span></div>
+<pre><code>import bcrypt from 'bcrypt';
+
+async function registerUser(email, plainPassword) {
+  const passwordHash = await bcrypt.hash(plainPassword, 12);
+  await users.insertOne({ email, passwordHash });
+}
+
+async function loginUser(email, plainPassword) {
+  const user = await users.findOne({ email });
+  if (!user) throw new Error('Invalid credentials');
+
+  const ok = await bcrypt.compare(plainPassword, user.passwordHash);
+  if (!ok) throw new Error('Invalid credentials');
+
+  return issueTokens({ sub: user._id, email: user.email });
+}</code></pre>
+        </div>
+        <div class="codebox">
+          <div class="codehead"><strong>argon2</strong><span>Argon2id за замовчуванням</span></div>
+<pre><code>import argon2 from 'argon2';
+
+async function registerUser(email, plainPassword) {
+  const passwordHash = await argon2.hash(plainPassword, {
+    type: argon2.argon2id,
+    memoryCost: 19456,
+    timeCost: 2,
+    parallelism: 1,
+  });
+
+  await users.insertOne({ email, passwordHash });
+}
+
+async function loginUser(email, plainPassword) {
+  const user = await users.findOne({ email });
+  if (!user) throw new Error('Invalid credentials');
+
+  const ok = await argon2.verify(user.passwordHash, plainPassword);
+  if (!ok) throw new Error('Invalid credentials');
+
+  return issueTokens({ sub: user._id, email: user.email });
+}</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Що важливо пам’ятати</h2>
+      <div class="steps">
+        <div class="step"><div class="num">A</div><div><strong>Не зберігайте plaintext</strong><div>У БД має бути тільки <code>passwordHash</code>, а не <code>password</code>.</div></div></div>
+        <div class="step"><div class="num">B</div><div><strong>Не "розшифровуйте" пароль</strong><div>Пароль не має повертатися у відновлюваному вигляді ні API, ні адміністратору.</div></div></div>
+        <div class="step"><div class="num">C</div><div><strong>Видавайте токени лише після verify</strong><div>JWT, session або refresh token створюються тільки після успішної перевірки хешу.</div></div></div>
+      </div>
+    </section>
+
+    <div class="footer">Статичне демо для пояснення архітектури автентифікації в Node.js.</div>
+  </div>
+
+  <script>
+    const toggle = document.querySelector('[data-theme-toggle]');
+    let theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+    toggle.addEventListener('click', () => {
+      theme = theme === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+    });
+
+    const result = document.getElementById('result');
+    const dbState = document.getElementById('dbState');
+    const cmpState = document.getElementById('cmpState');
+    const tokenState = document.getElementById('tokenState');
+    const password = document.getElementById('password');
+    const loginPassword = document.getElementById('loginPassword');
+    const algo = document.getElementById('algo');
+
+    function fakeHash(algoName, pwd) {
+      const seed = btoa(`${algoName}:${pwd}:${Date.now()}`).replace(/=/g, '').slice(0, 22);
+      if (algoName === 'bcrypt') return `$2b$12$${seed}${btoa(pwd).replace(/=/g, '').slice(0, 31)}`;
+      return `$argon2id$v=19$m=19456,t=2,p=1$${seed}$${btoa(pwd + '::verify').replace(/=/g, '').slice(0, 32)}`;
+    }
+
+    document.getElementById('simulate').addEventListener('click', () => {
+      const selected = algo.value;
+      const hash = fakeHash(selected, password.value);
+      const ok = password.value === loginPassword.value;
+
+      dbState.textContent = `email + ${selected} hash (${hash.slice(0, 34)}…)`;
+      cmpState.textContent = ok ? 'compare()/verify() = true' : 'compare()/verify() = false';
+      tokenState.textContent = ok ? 'Видано access + refresh token' : 'Токени не видані';
+
+      result.className = `status ${ok ? 'ok' : 'bad'}`;
+      result.textContent = ok
+        ? `Успіх: сервер зберіг тільки хеш ${selected} і після перевірки видав токени.`
+        : `Помилка входу: перевірка ${selected} не пройшла, тому токени не видані.`;
+    });
+
+    document.getElementById('wrongPass').addEventListener('click', () => {
+      loginPassword.value = 'WrongPassword!';
+    });
+  </script>
+</body>
+</html>
